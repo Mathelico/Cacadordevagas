@@ -24,15 +24,50 @@ public class OpenAIService
     public async Task<string> AnalisarVaga(string descricaoVaga)
     {
         var prompt = $"""
-            Analise a seguinte vaga de emprego:
+            Você é um sistema especializado em recrutamento de profissionais de tecnologia.
+
+            Compare o perfil do candidato com a vaga apresentada.
+
+            PERFIL DO CANDIDATO:
+
+            {PerfilCandidato.Perfil}
+
+
+            VAGA:
 
             {descricaoVaga}
 
-            Informe:
-            - Principais tecnologias exigidas
-            - Nível da vaga
-            - Principais requisitos
-            - Um pequeno resumo da vaga
+
+            Analise a compatibilidade considerando:
+            - experiência profissional
+            - formação
+            - tecnologias
+            - nível de senioridade
+            - requisitos obrigatórios
+            - requisitos desejáveis
+
+            Não invente experiências ou conhecimentos que não estejam no perfil.
+
+            Responda obrigatoriamente neste formato:
+
+            COMPATIBILIDADE: [0 a 100]%
+
+            RECOMENDACAO:
+            [CANDIDATAR ou NAO CANDIDATAR]
+
+            PONTOS FORTES:
+            - item
+            - item
+
+            CONHECIMENTOS AUSENTES:
+            - item
+            - item
+
+            NIVEL DA VAGA:
+            [Estágio, Júnior, Pleno, Sênior ou outro]
+
+            JUSTIFICATIVA:
+            [explicação curta]
             """;
 
         var body = new
