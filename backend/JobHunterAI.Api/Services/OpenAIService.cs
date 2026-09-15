@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using JobHunterAI.Api.Models;
 
 namespace JobHunterAI.Api.Services;
 
@@ -21,21 +22,21 @@ public class OpenAIService
             );
     }
 
-    public async Task<string> AnalisarVaga(string descricaoVaga)
+    public async Task<AnaliseVagaResponse> AnalisarVaga(string descricaoVaga)
     {
-        var prompt = $"""
+        var prompt = $$"""
             Você é um sistema especializado em recrutamento de profissionais de tecnologia.
 
             Compare o perfil do candidato com a vaga apresentada.
 
             PERFIL DO CANDIDATO:
 
-            {PerfilCandidato.Perfil}
+            {{PerfilCandidato.Perfil}}
 
 
             VAGA:
 
-            {descricaoVaga}
+            {{descricaoVaga}}
 
 
             Analise a compatibilidade considerando:
@@ -48,26 +49,26 @@ public class OpenAIService
 
             Não invente experiências ou conhecimentos que não estejam no perfil.
 
-            Responda obrigatoriamente neste formato:
+            Responda SOMENTE com um JSON válido.
 
-            COMPATIBILIDADE: [0 a 100]%
+            Não utilize Markdown.
+            Não utilize blocos de código.
+            Não escreva nenhum texto antes ou depois do JSON.
 
-            RECOMENDACAO:
-            [CANDIDATAR ou NAO CANDIDATAR]
+            Utilize exatamente esta estrutura:
 
-            PONTOS FORTES:
-            - item
-            - item
-
-            CONHECIMENTOS AUSENTES:
-            - item
-            - item
-
-            NIVEL DA VAGA:
-            [Estágio, Júnior, Pleno, Sênior ou outro]
-
-            JUSTIFICATIVA:
-            [explicação curta]
+            {
+                "compatibilidade": 0,
+                "recomendacao": "CANDIDATAR",
+                "pontosFortes": [
+                    "item"
+                ],
+                "conhecimentosAusentes": [
+                    "item"
+                ],
+                "nivelVaga": "Júnior",
+                "justificativa": "explicação curta"
+            }
             """;
 
         var body = new
@@ -108,28 +109,57 @@ public class OpenAIService
             );
         }
 
-        using var document = JsonDocument.Parse(responseContent);
+        using var document =
+            JsonDocument.Parse(responseContent);
 
-var output = document.RootElement.GetProperty("output");
+        var output =
+            document.RootElement.GetProperty("output");
 
-foreach (var item in output.EnumerateArray())
-{
-    if (!item.TryGetProperty("content", out var content))
-        continue;
-
-    foreach (var contentItem in content.EnumerateArray())
-    {
-        if (contentItem.TryGetProperty("type", out var type) &&
-            type.GetString() == "output_text" &&
-            contentItem.TryGetProperty("text", out var text))
+        foreach (var item in output.EnumerateArray())
         {
-            return text.GetString() ?? "";
-        }
-    }
-}
+            if (!item.TryGetProperty(
+                    "content",
+                    out var content))
+            {
+                continue;
+            }
 
-    throw new Exception(
-        $"A OpenAI não retornou texto na resposta. Resposta recebida: {responseContent}"
+            foreach (var contentItem in content.EnumerateArray())
+            {
+                if (contentItem.TryGetProperty(
+                        "type",
+                        out var type) &&
+                    type.GetString() == "output_text" &&
+                    contentItem.TryGetProperty(
+                        "text",
+                        out var text))
+                {
+                    var textoJson = text.GetString();
+
+                    if (string.IsNullOrWhiteSpace(textoJson))
+                    {
+                        continue;
+                    }
+
+                    var analise =
+                        JsonSerializer.Deserialize<AnaliseVagaResponse>(
+                            textoJson,
+                            new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            }
+                        );
+
+                    if (analise != null)
+                    {
+                        return analise;
+                    }
+                }
+            }
+        }
+
+        throw new Exception(
+            $"Não foi possível obter uma análise válida. Resposta: {responseContent}"
         );
     }
 }

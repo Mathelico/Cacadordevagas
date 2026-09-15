@@ -21,10 +21,7 @@ public class VagasController : ControllerBase
         var resultado =
             await _openAIService.AnalisarVaga(request.Descricao);
 
-        return Ok(new
-        {
-            analise = resultado
-        });
+        return Ok(resultado);
     }
 }
 
