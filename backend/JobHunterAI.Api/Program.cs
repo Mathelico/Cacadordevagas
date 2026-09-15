@@ -1,6 +1,15 @@
 using JobHunterAI.Api.Services;
+using JobHunterAI.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configura o PostgreSQL com Entity Framework Core
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    )
+);
 
 // Adiciona suporte a Controllers
 builder.Services.AddControllers();
