@@ -2,6 +2,7 @@ using JobHunterAI.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using JobHunterAI.Api.Data;
 using JobHunterAI.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobHunterAI.Api.Controllers;
 
@@ -50,15 +51,65 @@ public class VagasController : ControllerBase
 
         return Ok(vaga);
     }
+    [HttpGet]
+    public async Task<IActionResult> Listar()
+        {
+            var vagas = await _context.Vagas
+                .OrderByDescending(v => v.DataAnalise)
+                .ToListAsync();
+
+            return Ok(vagas);
+        }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> BuscarPorId(int id)
+        {
+        Console.WriteLine($"ENTROU NO BuscarPorId - ID: {id}");
+
+        var vaga = await _context.Vagas.FindAsync(id);
+
+        if (vaga == null)
+        {
+             return NotFound(new
+            {
+                 mensagem = "Vaga não encontrada."
+            });
+        }
+
+            return Ok(vaga);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Excluir(int id)
+        {
+            var vaga = await _context.Vagas.FindAsync(id);
+
+            if (vaga == null)
+            {
+                return NotFound(new
+                {
+                    mensagem = "Vaga não encontrada."
+                });
+            }
+
+            _context.Vagas.Remove(vaga);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                mensagem = "Vaga excluída com sucesso."
+            });
+        }
 }
 
-public class AnalisarVagaRequest
-{
-    public string Cargo { get; set; } = "";
+    public class AnalisarVagaRequest
+    {
+        public string Cargo { get; set; } = "";
 
-    public string Empresa { get; set; } = "";
+        public string Empresa { get; set; } = "";
 
-    public string Descricao { get; set; } = "";
+        public string Descricao { get; set; } = "";
 
-    public string Link { get; set; } = "";
-}
+        public string Link { get; set; } = "";
+    }
