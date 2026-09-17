@@ -10,15 +10,18 @@ namespace JobHunterAI.Api.Controllers;
 [Route("api/vagas")]
 public class VagasController : ControllerBase
 {
+    private readonly RemotiveService _remotiveService;
     private readonly OpenAIService _openAIService;
     private readonly AppDbContext _context;
 
     public VagasController(
         OpenAIService openAIService,
-        AppDbContext context)
+        AppDbContext context,
+        RemotiveService remotiveService)
     {
         _openAIService = openAIService;
         _context = context;
+        _remotiveService = remotiveService;
     }
 
     [HttpPost("analisar")]
@@ -101,6 +104,13 @@ public class VagasController : ControllerBase
                 mensagem = "Vaga excluída com sucesso."
             });
         }
+    [HttpGet("buscar")]
+    public async Task<IActionResult> BuscarVagas()
+    {
+        var vagas = await _remotiveService.BuscarVagas();
+
+        return Ok(vagas);
+    }
 }
 
     public class AnalisarVagaRequest

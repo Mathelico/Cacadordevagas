@@ -17,6 +17,8 @@ builder.Services.AddControllers();
 // Registra o serviço responsável pela comunicação com a OpenAI
 builder.Services.AddHttpClient<OpenAIService>();
 
+builder.Services.AddHttpClient<RemotiveService>();
+
 // OpenAPI
 builder.Services.AddOpenApi();
 
