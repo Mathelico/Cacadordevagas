@@ -11,17 +11,23 @@ namespace JobHunterAI.Api.Controllers;
 public class VagasController : ControllerBase
 {
     private readonly RemotiveService _remotiveService;
+    private readonly JoobleService _joobleService;
     private readonly OpenAIService _openAIService;
     private readonly AppDbContext _context;
+    private readonly VagaSearchService _vagaSearchService;
 
-    public VagasController(
-        OpenAIService openAIService,
-        AppDbContext context,
-        RemotiveService remotiveService)
+public VagasController(
+    OpenAIService openAIService,
+    AppDbContext context,
+    RemotiveService remotiveService,
+    JoobleService joobleService,
+    VagaSearchService vagaSearchService)
     {
         _openAIService = openAIService;
         _context = context;
         _remotiveService = remotiveService;
+        _joobleService = joobleService;
+        _vagaSearchService = vagaSearchService;
     }
 
     [HttpPost("analisar")]
@@ -67,7 +73,6 @@ public class VagasController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> BuscarPorId(int id)
         {
-        Console.WriteLine($"ENTROU NO BuscarPorId - ID: {id}");
 
         var vaga = await _context.Vagas.FindAsync(id);
 
@@ -83,7 +88,7 @@ public class VagasController : ControllerBase
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Excluir(int id)
+    public async Task<IActionResult> Excluir(int id)
         {
             var vaga = await _context.Vagas.FindAsync(id);
 
@@ -108,6 +113,22 @@ public class VagasController : ControllerBase
     public async Task<IActionResult> BuscarVagas()
     {
         var vagas = await _remotiveService.BuscarVagas();
+
+        return Ok(vagas);
+    }
+
+    [HttpGet("buscar-jooble")]
+    public async Task<IActionResult> BuscarJooble()
+    {
+        var vagas = await _joobleService.BuscarVagas();
+
+        return Ok(vagas);
+    }
+
+        [HttpGet("buscar-todas")]
+    public async Task<IActionResult> BuscarTodas()
+    {
+        var vagas = await _vagaSearchService.BuscarTodas();
 
         return Ok(vagas);
     }

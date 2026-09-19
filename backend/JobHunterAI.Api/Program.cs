@@ -19,6 +19,10 @@ builder.Services.AddHttpClient<OpenAIService>();
 
 builder.Services.AddHttpClient<RemotiveService>();
 
+builder.Services.AddHttpClient<JoobleService>();
+
+builder.Services.AddScoped<VagaSearchService>();
+
 // OpenAPI
 builder.Services.AddOpenApi();
 
