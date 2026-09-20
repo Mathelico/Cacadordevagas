@@ -205,6 +205,34 @@ public VagasController(
 
             return Ok(vagas);
         }
+
+    [HttpGet("resumo")]
+        public async Task<IActionResult> Resumo()
+        {
+            var total = await _context.Vagas.CountAsync();
+
+            var candidatar = await _context.Vagas
+                .CountAsync(v => v.Recomendacao == "CANDIDATAR");
+
+            var analisar = await _context.Vagas
+                .CountAsync(v => v.Recomendacao == "ANALISAR");
+
+            var ignorar = await _context.Vagas
+                .CountAsync(v => v.Recomendacao == "IGNORAR");
+
+            var mediaCompatibilidade = total > 0
+                ? await _context.Vagas.AverageAsync(v => v.Compatibilidade)
+                : 0;
+
+            return Ok(new
+            {
+                total,
+                candidatar,
+                analisar,
+                ignorar,
+                mediaCompatibilidade = Math.Round(mediaCompatibilidade, 1)
+            });
+        }
 }
 
     public class AnalisarVagaRequest
