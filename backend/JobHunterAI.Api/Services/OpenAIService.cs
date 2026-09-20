@@ -156,12 +156,7 @@ public class OpenAIService
                     if (analise != null)
                     {
                         analise.Recomendacao =
-                            analise.Compatibilidade switch
-                            {
-                                >= 80 => "CANDIDATAR",
-                                >= 60 => "ANALISAR",
-                                _ => "IGNORAR"
-                            };
+                        DefinirRecomendacao(analise.Compatibilidade);   
 
                         return analise;
                     }
@@ -173,4 +168,14 @@ public class OpenAIService
             $"Não foi possível obter uma análise válida. Resposta: {responseContent}"
         );
     }
+
+    private string DefinirRecomendacao(int compatibilidade)
+{
+    return compatibilidade switch
+    {
+        >= 80 => "CANDIDATAR",
+        >= 60 => "ANALISAR",
+        _ => "IGNORAR"
+    };
+}
 }
