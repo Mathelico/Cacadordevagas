@@ -118,60 +118,93 @@ public VagasController(
     }
 
     [HttpGet("buscar-jooble")]
-    public async Task<IActionResult> BuscarJooble()
-    {
-        var vagas = await _joobleService.BuscarVagas();
-
-        return Ok(vagas);
-    }
-
-        [HttpGet("buscar-todas")]
-    public async Task<IActionResult> BuscarTodas()
-    {
-        var vagas = await _vagaSearchService.BuscarTodas();
-
-        return Ok(vagas);
-    }
-
-        [HttpGet("analisar-primeira")]
-    public async Task<IActionResult> AnalisarPrimeira()
-    {
-        var resultado =
-            await _vagaSearchService.AnalisarPrimeiraVaga();
-
-        if (resultado == null)
+        public async Task<IActionResult> BuscarJooble()
         {
-            return NotFound(new
-            {
-                mensagem = "Nenhuma vaga encontrada."
-            });
+            var vagas = await _joobleService.BuscarVagas();
+
+            return Ok(vagas);
         }
 
-        return Ok(resultado);
-    }
+    [HttpGet("buscar-todas")]
+        public async Task<IActionResult> BuscarTodas()
+            {
+            var vagas = await _vagaSearchService.BuscarTodas();
+
+            return Ok(vagas);
+            }
+
+    [HttpGet("analisar-primeira")]
+        public async Task<IActionResult> AnalisarPrimeira()
+        {
+            var resultado =
+                    await _vagaSearchService.AnalisarPrimeiraVaga();
+
+            if (resultado == null)
+                {
+                    return NotFound(new
+                    {
+                        mensagem = "Nenhuma vaga encontrada."
+                    });
+                }
+
+                return Ok(resultado);
+        }
 
     [HttpGet("analisar-vagas")]
-    public async Task<IActionResult> AnalisarVagas()
-    {
-        var resultado =
-            await _vagaSearchService.AnalisarVagas();
+        public async Task<IActionResult> AnalisarVagas()
+        {
+            var resultado =
+                await _vagaSearchService.AnalisarVagas();
 
-        return Ok(resultado);
-    }
+            return Ok(resultado);
+        }
 
     [HttpPost("analisar-e-salvar")]
-    public async Task<IActionResult> AnalisarESalvar(
-        [FromQuery] int limite = 3)
-    {
-        var quantidade =
-            await _vagaSearchService.AnalisarESalvarVagas(limite);
-
-        return Ok(new
+        public async Task<IActionResult> AnalisarESalvar(
+            [FromQuery] int limite = 3)
         {
-            mensagem = "Análise concluída.",
-            vagasSalvas = quantidade
-        });
+            var quantidade =
+                await _vagaSearchService.AnalisarESalvarVagas(limite);
+
+            return Ok(new
+            {
+                mensagem = "Análise concluída.",
+                vagasSalvas = quantidade
+            });
     }
+
+    [HttpGet("candidatar")]
+        public async Task<IActionResult> ListarParaCandidatar()
+        {
+            var vagas = await _context.Vagas
+                .Where(v => v.Recomendacao == "CANDIDATAR")
+                .OrderByDescending(v => v.Compatibilidade)
+                .ToListAsync();
+
+            return Ok(vagas);
+        }
+
+        [HttpGet("analisar")]
+        public async Task<IActionResult> ListarParaAnalisar()
+        {
+            var vagas = await _context.Vagas
+                .Where(v => v.Recomendacao == "ANALISAR")
+                .OrderByDescending(v => v.Compatibilidade)
+                .ToListAsync();
+
+            return Ok(vagas);
+        }
+
+        [HttpGet("ignorar")]
+        public async Task<IActionResult> ListarParaIgnorar()
+        {
+            var vagas = await _context.Vagas
+                .Where(v => v.Recomendacao == "IGNORAR")
+                .OrderByDescending(v => v.Compatibilidade)
+                .ToListAsync();
+
+            return Ok(vagas);
+        }
 }
 
     public class AnalisarVagaRequest
