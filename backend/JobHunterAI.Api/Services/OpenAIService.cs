@@ -22,10 +22,12 @@ public class OpenAIService
             );
     }
 
-    public async Task<AnaliseVagaResponse> AnalisarVaga(string descricaoVaga)
+    public async Task<AnaliseVagaResponse> AnalisarVaga(
+        string descricaoVaga)
     {
         var prompt = $$"""
-            Você é um sistema especializado em recrutamento de profissionais de tecnologia.
+            Você é um sistema especializado em recrutamento
+            de profissionais de tecnologia.
 
             Compare o perfil do candidato com a vaga apresentada.
 
@@ -47,7 +49,8 @@ public class OpenAIService
             - requisitos obrigatórios
             - requisitos desejáveis
 
-            Não invente experiências ou conhecimentos que não estejam no perfil.
+            Não invente experiências ou conhecimentos
+            que não estejam no perfil.
 
             Responda SOMENTE com um JSON válido.
 
@@ -152,6 +155,14 @@ public class OpenAIService
 
                     if (analise != null)
                     {
+                        analise.Recomendacao =
+                            analise.Compatibilidade switch
+                            {
+                                >= 80 => "CANDIDATAR",
+                                >= 60 => "ANALISAR",
+                                _ => "IGNORAR"
+                            };
+
                         return analise;
                     }
                 }

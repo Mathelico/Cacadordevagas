@@ -132,6 +132,46 @@ public VagasController(
 
         return Ok(vagas);
     }
+
+        [HttpGet("analisar-primeira")]
+    public async Task<IActionResult> AnalisarPrimeira()
+    {
+        var resultado =
+            await _vagaSearchService.AnalisarPrimeiraVaga();
+
+        if (resultado == null)
+        {
+            return NotFound(new
+            {
+                mensagem = "Nenhuma vaga encontrada."
+            });
+        }
+
+        return Ok(resultado);
+    }
+
+    [HttpGet("analisar-vagas")]
+    public async Task<IActionResult> AnalisarVagas()
+    {
+        var resultado =
+            await _vagaSearchService.AnalisarVagas();
+
+        return Ok(resultado);
+    }
+
+    [HttpPost("analisar-e-salvar")]
+    public async Task<IActionResult> AnalisarESalvar(
+        [FromQuery] int limite = 3)
+    {
+        var quantidade =
+            await _vagaSearchService.AnalisarESalvarVagas(limite);
+
+        return Ok(new
+        {
+            mensagem = "Análise concluída.",
+            vagasSalvas = quantidade
+        });
+    }
 }
 
     public class AnalisarVagaRequest
