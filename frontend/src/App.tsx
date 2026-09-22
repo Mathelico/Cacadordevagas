@@ -19,6 +19,7 @@ interface Vaga {
   recomendacao: string;
   nivelVaga: string;
   justificativa: string;
+  visualizada: boolean;
 }
 
 type Filtro = "TODAS" | "CANDIDATAR" | "ANALISAR" | "IGNORAR";
@@ -29,7 +30,7 @@ function App() {
   const [vagaSelecionada, setVagaSelecionada] = useState<number | null>(null);
   const [filtro, setFiltro] = useState<Filtro>("TODAS");
   const [busca, setBusca] = useState("");
-
+  const [limiteBusca, setLimiteBusca] = useState(1);
   const [buscandoVagas, setBuscandoVagas] = useState(false);
   const [mensagem, setMensagem] = useState("");
 
@@ -59,7 +60,7 @@ function App() {
       setMensagem("");
 
       const resposta = await fetch(
-        "http://localhost:5245/api/vagas/analisar-e-salvar?limite=1",
+        `http://localhost:5245/api/vagas/analisar-e-salvar?limite=${limiteBusca}`,
         {
           method: "POST",
         }
@@ -83,7 +84,33 @@ function App() {
       setBuscandoVagas(false);
     }
   }
+async function atualizarVisualizada(
+  vaga: Vaga,
+  visualizada: boolean
+) {
+  const resposta = await fetch(
+    `http://localhost:5245/api/vagas/${vaga.id}/visualizada`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(visualizada),
+    }
+  );
 
+  if (!resposta.ok) {
+    return;
+  }
+
+  const vagaAtualizada = await resposta.json();
+
+  setVagas((vagasAtuais) =>
+    vagasAtuais.map((item) =>
+      item.id === vaga.id ? vagaAtualizada : item
+    )
+  );
+}
   if (!resumo) {
     return <h1>Carregando...</h1>;
   }
@@ -165,6 +192,17 @@ function App() {
       </div>
 
       <div className="acoes">
+        <select
+          value={limiteBusca}
+          onChange={(event) =>
+            setLimiteBusca(Number(event.target.value))
+          }
+          disabled={buscandoVagas}
+        >
+          <option value={1}>1 vaga</option>
+          <option value={3}>3 vagas</option>
+          <option value={5}>5 vagas</option>
+        </select>
         <button
           onClick={buscarNovasVagas}
           disabled={buscandoVagas}
@@ -237,6 +275,24 @@ function App() {
                 </p>
 
                 <p>{vaga.descricao}</p>
+                
+                <button
+                  className={`botao-visualizada ${
+                    vaga.visualizada ? "visualizada" : ""
+                  }`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+
+                    atualizarVisualizada(
+                      vaga,
+                      !vaga.visualizada
+                    );
+                  }}
+                >
+                  {vaga.visualizada
+                    ? "✓ Vaga visualizada"
+                    : "Marcar como visualizada"}
+                </button>
 
                 <a
                   href={vaga.link}

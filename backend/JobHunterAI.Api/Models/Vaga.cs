@@ -20,5 +20,7 @@ public class Vaga
 
     public string Justificativa { get; set; } = "";
 
+    public bool Visualizada { get; set; } = false;
+
     public DateTime DataAnalise { get; set; } = DateTime.UtcNow;
 }
