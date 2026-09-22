@@ -14,6 +14,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Adiciona suporte a Controllers
 builder.Services.AddControllers();
 
+builder.Services.AddMemoryCache();
+
 // Registra o serviço responsável pela comunicação com a OpenAI
 builder.Services.AddHttpClient<OpenAIService>();
 
