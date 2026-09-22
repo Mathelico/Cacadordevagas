@@ -229,3 +229,16 @@
   border-color: #22c55e;
   color: #dcfce7;
 }
+
+.status-visualizada {
+  font-size: 13px;
+  padding: 6px 10px;
+
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+
+  border: 1px solid #3b82f6;
+  border-radius: 20px;
+
+  font-weight: bold;
+}

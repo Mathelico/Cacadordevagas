@@ -255,7 +255,13 @@ async function atualizarVisualizada(
                 >
                   {vaga.recomendacao}
                 </span>
-              </div>
+
+                {vaga.visualizada && (
+                  <span className="status-visualizada">
+                    ✓ Visualizada
+                  </span>
+                )}
+                </div>
             </div>
 
             {vagaSelecionada === vaga.id && (
