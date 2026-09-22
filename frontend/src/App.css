@@ -1,0 +1,41 @@
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.container h1 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.card h2 {
+  font-size: 32px;
+  margin: 0 0 10px;
+}
+
+.card p {
+  margin: 0;
+  color: #aaa;
+}

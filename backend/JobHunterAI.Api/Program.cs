@@ -26,7 +26,20 @@ builder.Services.AddScoped<VagaSearchService>();
 // OpenAPI
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors("Frontend");
 
 // Configura o OpenAPI apenas em desenvolvimento
 if (app.Environment.IsDevelopment())
