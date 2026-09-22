@@ -21,10 +21,14 @@ interface Vaga {
   justificativa: string;
 }
 
+type Filtro = "TODAS" | "CANDIDATAR" | "ANALISAR" | "IGNORAR";
+
 function App() {
   const [resumo, setResumo] = useState<ResumoVagas | null>(null);
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [vagaSelecionada, setVagaSelecionada] = useState<number | null>(null);
+  const [filtro, setFiltro] = useState<Filtro>("TODAS");
+  const [busca, setBusca] = useState("");
 
   useEffect(() => {
     async function carregarDados() {
@@ -52,27 +56,66 @@ function App() {
     return <h1>Carregando...</h1>;
   }
 
+  const vagasFiltradas = (
+    filtro === "TODAS"
+      ? vagas
+      : vagas.filter((vaga) => vaga.recomendacao === filtro)
+  )
+    .filter((vaga) => {
+      const termo = busca.toLowerCase();
+
+      return (
+        vaga.cargo.toLowerCase().includes(termo) ||
+        vaga.empresa.toLowerCase().includes(termo)
+      );
+    })
+    .sort((a, b) => b.compatibilidade - a.compatibilidade);
+
   return (
     <div className="container">
       <h1>JobHunter AI</h1>
 
       <div className="cards">
-        <div className="card">
+        <div
+          className={`card ${filtro === "TODAS" ? "card-ativo" : ""}`}
+          onClick={() => {
+            setFiltro("TODAS");
+            setVagaSelecionada(null);
+          }}
+        >
           <h2>{resumo.total}</h2>
           <p>Vagas analisadas</p>
         </div>
 
-        <div className="card">
+        <div
+          className={`card ${filtro === "CANDIDATAR" ? "card-ativo" : ""}`}
+          onClick={() => {
+            setFiltro("CANDIDATAR");
+            setVagaSelecionada(null);
+          }}
+        >
           <h2>{resumo.candidatar}</h2>
           <p>Candidatar</p>
         </div>
 
-        <div className="card">
+        <div
+          className={`card ${filtro === "ANALISAR" ? "card-ativo" : ""}`}
+          onClick={() => {
+            setFiltro("ANALISAR");
+            setVagaSelecionada(null);
+          }}
+        >
           <h2>{resumo.analisar}</h2>
           <p>Analisar</p>
         </div>
 
-        <div className="card">
+        <div
+          className={`card ${filtro === "IGNORAR" ? "card-ativo" : ""}`}
+          onClick={() => {
+            setFiltro("IGNORAR");
+            setVagaSelecionada(null);
+          }}
+        >
           <h2>{resumo.ignorar}</h2>
           <p>Ignorar</p>
         </div>
@@ -83,10 +126,23 @@ function App() {
         </div>
       </div>
 
-      <h2 className="titulo-vagas">Vagas encontradas</h2>
+      <div className="busca-container">
+      <input
+        type="text"
+        placeholder="Buscar por cargo ou empresa..."
+        value={busca}
+        onChange={(event) => setBusca(event.target.value)}
+      />
+    </div>
+
+      <h2 className="titulo-vagas">
+        {filtro === "TODAS"
+          ? "Vagas encontradas"
+          : `Vagas: ${filtro}`}
+      </h2>
 
       <div className="lista-vagas">
-        {vagas.map((vaga) => (
+        {vagasFiltradas.map((vaga) => (
           <div
             className="vaga-card"
             key={vaga.id}
@@ -96,29 +152,39 @@ function App() {
               )
             }
           >
-          <div className="vaga-topo">
-            <div>
-              <h3>{vaga.cargo}</h3>
-              <p className="empresa">{vaga.empresa}</p>
-            </div>
+            <div className="vaga-topo">
+              <div>
+                <h3>{vaga.cargo}</h3>
 
-            <div className="vaga-info">
-              <strong>{vaga.compatibilidade}%</strong>
+                <p className="empresa">
+                  {vaga.empresa}
+                </p>
+              </div>
 
-              <span className={`status ${vaga.recomendacao.toLowerCase()}`}>
-                {vaga.recomendacao}
-              </span>
+              <div className="vaga-info">
+                <strong>
+                  {vaga.compatibilidade}%
+                </strong>
+
+                <span
+                  className={`status ${vaga.recomendacao.toLowerCase()}`}
+                >
+                  {vaga.recomendacao}
+                </span>
+              </div>
             </div>
-          </div>
 
             {vagaSelecionada === vaga.id && (
               <div className="vaga-detalhes">
                 <p>
-                  <strong>Nível:</strong> {vaga.nivelVaga}
+                  <strong>Nível:</strong>{" "}
+                  {vaga.nivelVaga}
                 </p>
 
                 <p>
-                  <strong>Justificativa da IA:</strong>
+                  <strong>
+                    Justificativa da IA:
+                  </strong>
                 </p>
 
                 <p>{vaga.justificativa}</p>
@@ -133,7 +199,9 @@ function App() {
                   href={vaga.link}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={(event) => event.stopPropagation()}
+                  onClick={(event) =>
+                    event.stopPropagation()
+                  }
                 >
                   Abrir vaga
                 </a>

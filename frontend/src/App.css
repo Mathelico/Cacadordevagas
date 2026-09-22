@@ -124,3 +124,44 @@
   color: #ccc;
   line-height: 1.6;
 }
+
+.card {
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: #555;
+}
+
+.card-ativo {
+  border-color: #888;
+  background: #292929;
+  transform: translateY(-2px);
+}
+
+.busca-container {
+  margin-top: 40px;
+}
+
+.busca-container input {
+  width: 100%;
+  padding: 14px 16px;
+
+  background: #1f1f1f;
+  color: #fff;
+
+  border: 1px solid #333;
+  border-radius: 10px;
+
+  font-size: 15px;
+  outline: none;
+}
+
+.busca-container input:focus {
+  border-color: #666;
+}
+
+.busca-container input::placeholder {
+  color: #777;
+}
