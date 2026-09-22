@@ -165,3 +165,34 @@
 .busca-container input::placeholder {
   color: #777;
 }
+
+.acoes {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.acoes button {
+  padding: 12px 20px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.acoes button:hover {
+  background: #1d4ed8;
+}
+
+.acoes button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.acoes p {
+  margin: 0;
+  color: #aaa;
+}

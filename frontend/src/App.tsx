@@ -30,27 +30,59 @@ function App() {
   const [filtro, setFiltro] = useState<Filtro>("TODAS");
   const [busca, setBusca] = useState("");
 
+  const [buscandoVagas, setBuscandoVagas] = useState(false);
+  const [mensagem, setMensagem] = useState("");
+
+  async function carregarDados() {
+    const respostaResumo = await fetch(
+      "http://localhost:5245/api/vagas/resumo"
+    );
+
+    const dadosResumo = await respostaResumo.json();
+    setResumo(dadosResumo);
+
+    const respostaVagas = await fetch(
+      "http://localhost:5245/api/vagas"
+    );
+
+    const dadosVagas = await respostaVagas.json();
+    setVagas(dadosVagas);
+  }
+
   useEffect(() => {
-    async function carregarDados() {
-      const respostaResumo = await fetch(
-        "http://localhost:5245/api/vagas/resumo"
-      );
-
-      const dadosResumo = await respostaResumo.json();
-
-      setResumo(dadosResumo);
-
-      const respostaVagas = await fetch(
-        "http://localhost:5245/api/vagas"
-      );
-
-      const dadosVagas = await respostaVagas.json();
-
-      setVagas(dadosVagas);
-    }
-
     carregarDados();
   }, []);
+
+  async function buscarNovasVagas() {
+    try {
+      setBuscandoVagas(true);
+      setMensagem("");
+
+      const resposta = await fetch(
+        "http://localhost:5245/api/vagas/analisar-e-salvar?limite=1",
+        {
+          method: "POST",
+        }
+      );
+
+      if (!resposta.ok) {
+        throw new Error("Erro ao buscar novas vagas.");
+      }
+
+      const dados = await resposta.json();
+
+      setMensagem(
+        `${dados.vagasSalvas} nova(s) vaga(s) analisada(s).`
+      );
+
+      await carregarDados();
+    } catch (erro) {
+      console.error(erro);
+      setMensagem("Não foi possível buscar novas vagas.");
+    } finally {
+      setBuscandoVagas(false);
+    }
+  }
 
   if (!resumo) {
     return <h1>Carregando...</h1>;
@@ -88,7 +120,9 @@ function App() {
         </div>
 
         <div
-          className={`card ${filtro === "CANDIDATAR" ? "card-ativo" : ""}`}
+          className={`card ${
+            filtro === "CANDIDATAR" ? "card-ativo" : ""
+          }`}
           onClick={() => {
             setFiltro("CANDIDATAR");
             setVagaSelecionada(null);
@@ -99,7 +133,9 @@ function App() {
         </div>
 
         <div
-          className={`card ${filtro === "ANALISAR" ? "card-ativo" : ""}`}
+          className={`card ${
+            filtro === "ANALISAR" ? "card-ativo" : ""
+          }`}
           onClick={() => {
             setFiltro("ANALISAR");
             setVagaSelecionada(null);
@@ -110,7 +146,9 @@ function App() {
         </div>
 
         <div
-          className={`card ${filtro === "IGNORAR" ? "card-ativo" : ""}`}
+          className={`card ${
+            filtro === "IGNORAR" ? "card-ativo" : ""
+          }`}
           onClick={() => {
             setFiltro("IGNORAR");
             setVagaSelecionada(null);
@@ -126,14 +164,27 @@ function App() {
         </div>
       </div>
 
+      <div className="acoes">
+        <button
+          onClick={buscarNovasVagas}
+          disabled={buscandoVagas}
+        >
+          {buscandoVagas
+            ? "Buscando e analisando..."
+            : "Buscar novas vagas"}
+        </button>
+
+        {mensagem && <p>{mensagem}</p>}
+      </div>
+
       <div className="busca-container">
-      <input
-        type="text"
-        placeholder="Buscar por cargo ou empresa..."
-        value={busca}
-        onChange={(event) => setBusca(event.target.value)}
-      />
-    </div>
+        <input
+          type="text"
+          placeholder="Buscar por cargo ou empresa..."
+          value={busca}
+          onChange={(event) => setBusca(event.target.value)}
+        />
+      </div>
 
       <h2 className="titulo-vagas">
         {filtro === "TODAS"
@@ -155,16 +206,11 @@ function App() {
             <div className="vaga-topo">
               <div>
                 <h3>{vaga.cargo}</h3>
-
-                <p className="empresa">
-                  {vaga.empresa}
-                </p>
+                <p className="empresa">{vaga.empresa}</p>
               </div>
 
               <div className="vaga-info">
-                <strong>
-                  {vaga.compatibilidade}%
-                </strong>
+                <strong>{vaga.compatibilidade}%</strong>
 
                 <span
                   className={`status ${vaga.recomendacao.toLowerCase()}`}
@@ -177,14 +223,11 @@ function App() {
             {vagaSelecionada === vaga.id && (
               <div className="vaga-detalhes">
                 <p>
-                  <strong>Nível:</strong>{" "}
-                  {vaga.nivelVaga}
+                  <strong>Nível:</strong> {vaga.nivelVaga}
                 </p>
 
                 <p>
-                  <strong>
-                    Justificativa da IA:
-                  </strong>
+                  <strong>Justificativa da IA:</strong>
                 </p>
 
                 <p>{vaga.justificativa}</p>
@@ -199,9 +242,7 @@ function App() {
                   href={vaga.link}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={(event) =>
-                    event.stopPropagation()
-                  }
+                  onClick={(event) => event.stopPropagation()}
                 >
                   Abrir vaga
                 </a>
