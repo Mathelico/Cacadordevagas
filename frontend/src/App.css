@@ -39,3 +39,88 @@
   margin: 0;
   color: #aaa;
 }
+
+.status {
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.status.candidatar {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid #22c55e;
+}
+
+.status.analisar {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid #eab308;
+}
+
+.status.ignorar {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.titulo-vagas {
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+.lista-vagas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vaga-card {
+  background: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px 24px;
+  cursor: pointer;
+}
+
+.vaga-card h3 {
+  margin: 0 0 8px;
+}
+
+.empresa {
+  margin: 0;
+  color: #aaa;
+}
+
+.vaga-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.vaga-info strong {
+  font-size: 22px;
+}
+
+.vaga-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.vaga-topo h3 {
+  margin: 0 0 8px;
+}
+
+.vaga-detalhes {
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  color: #ccc;
+  line-height: 1.6;
+}

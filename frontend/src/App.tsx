@@ -9,28 +9,50 @@ interface ResumoVagas {
   mediaCompatibilidade: number;
 }
 
+interface Vaga {
+  id: number;
+  cargo: string;
+  empresa: string;
+  descricao: string;
+  link: string;
+  compatibilidade: number;
+  recomendacao: string;
+  nivelVaga: string;
+  justificativa: string;
+}
+
 function App() {
   const [resumo, setResumo] = useState<ResumoVagas | null>(null);
+  const [vagas, setVagas] = useState<Vaga[]>([]);
+  const [vagaSelecionada, setVagaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
-    async function carregarResumo() {
-      const resposta = await fetch(
+    async function carregarDados() {
+      const respostaResumo = await fetch(
         "http://localhost:5245/api/vagas/resumo"
       );
 
-      const dados = await resposta.json();
+      const dadosResumo = await respostaResumo.json();
 
-      setResumo(dados);
+      setResumo(dadosResumo);
+
+      const respostaVagas = await fetch(
+        "http://localhost:5245/api/vagas"
+      );
+
+      const dadosVagas = await respostaVagas.json();
+
+      setVagas(dadosVagas);
     }
 
-    carregarResumo();
+    carregarDados();
   }, []);
 
   if (!resumo) {
     return <h1>Carregando...</h1>;
   }
 
-return (
+  return (
     <div className="container">
       <h1>JobHunter AI</h1>
 
@@ -59,6 +81,66 @@ return (
           <h2>{resumo.mediaCompatibilidade}%</h2>
           <p>Média de compatibilidade</p>
         </div>
+      </div>
+
+      <h2 className="titulo-vagas">Vagas encontradas</h2>
+
+      <div className="lista-vagas">
+        {vagas.map((vaga) => (
+          <div
+            className="vaga-card"
+            key={vaga.id}
+            onClick={() =>
+              setVagaSelecionada(
+                vagaSelecionada === vaga.id ? null : vaga.id
+              )
+            }
+          >
+          <div className="vaga-topo">
+            <div>
+              <h3>{vaga.cargo}</h3>
+              <p className="empresa">{vaga.empresa}</p>
+            </div>
+
+            <div className="vaga-info">
+              <strong>{vaga.compatibilidade}%</strong>
+
+              <span className={`status ${vaga.recomendacao.toLowerCase()}`}>
+                {vaga.recomendacao}
+              </span>
+            </div>
+          </div>
+
+            {vagaSelecionada === vaga.id && (
+              <div className="vaga-detalhes">
+                <p>
+                  <strong>Nível:</strong> {vaga.nivelVaga}
+                </p>
+
+                <p>
+                  <strong>Justificativa da IA:</strong>
+                </p>
+
+                <p>{vaga.justificativa}</p>
+
+                <p>
+                  <strong>Descrição:</strong>
+                </p>
+
+                <p>{vaga.descricao}</p>
+
+                <a
+                  href={vaga.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  Abrir vaga
+                </a>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
