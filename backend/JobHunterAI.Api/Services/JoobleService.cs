@@ -134,7 +134,8 @@ public class JoobleService
             "programming",
             "automação",
             "rpa",
-            "suporte"
+            "suporte",
+            "java",
         };
 
         var termosIndesejados = new[]

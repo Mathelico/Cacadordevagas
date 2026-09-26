@@ -12,19 +12,22 @@ public class VagaSearchService
     private readonly JoobleService _joobleService;
     private readonly OpenAIService _openAIService;
     private readonly AppDbContext _context;
+    private readonly AdzunaService _adzunaService;
 
     public VagaSearchService(
         RemotiveService remotiveService,
         JoobleService joobleService,
+        AdzunaService adzunaService,
         OpenAIService openAIService,
         AppDbContext context)
     {
         _remotiveService = remotiveService;
         _joobleService = joobleService;
+        _adzunaService = adzunaService;
         _openAIService = openAIService;
         _context = context;
     }
-    public async Task<List<VagaEncontrada>> BuscarTodas()
+        public async Task<List<VagaEncontrada>> BuscarTodas()
     {
         var vagasEncontradas = new List<VagaEncontrada>();
 
@@ -34,6 +37,10 @@ public class VagaSearchService
         var vagasJooble =
             await _joobleService.BuscarVagas();
 
+        var vagasAdzuna =
+            await _adzunaService.BuscarVagas();
+
+        // Remotive
         foreach (var vaga in vagasRemotive)
         {
             vagasEncontradas.Add(new VagaEncontrada
@@ -42,13 +49,14 @@ public class VagaSearchService
                 Titulo = vaga.Title,
                 Empresa = vaga.CompanyName,
                 Localizacao = vaga.CandidateRequiredLocation,
-                Descricao = vaga.Description,
+                Descricao = LimparHtml(vaga.Description),
                 Link = vaga.Url,
                 Fonte = "Remotive",
                 DataPublicacao = vaga.PublicationDate
             });
         }
 
+        // Jooble
         foreach (var vaga in vagasJooble)
         {
             vagasEncontradas.Add(new VagaEncontrada
@@ -64,6 +72,23 @@ public class VagaSearchService
             });
         }
 
+        // Adzuna
+        foreach (var vaga in vagasAdzuna)
+        {
+            vagasEncontradas.Add(new VagaEncontrada
+            {
+                IdExterno = vaga.Id,
+                Titulo = vaga.Title,
+                Empresa = vaga.Company.DisplayName,
+                Localizacao = vaga.Location.DisplayName,
+                Descricao = LimparHtml(vaga.Description),
+                Link = vaga.RedirectUrl,
+                Fonte = "Adzuna",
+                DataPublicacao = vaga.Created
+            });
+        }
+
+        // Remove vagas duplicadas entre as fontes
         var vagasSemDuplicidade = vagasEncontradas
             .GroupBy(vaga => new
             {

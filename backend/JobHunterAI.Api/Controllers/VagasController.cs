@@ -15,18 +15,21 @@ public class VagasController : ControllerBase
     private readonly OpenAIService _openAIService;
     private readonly AppDbContext _context;
     private readonly VagaSearchService _vagaSearchService;
+    private readonly AdzunaService _adzunaService;
 
     public VagasController(
         OpenAIService openAIService,
         AppDbContext context,
         RemotiveService remotiveService,
         JoobleService joobleService,
+        AdzunaService adzunaService,
         VagaSearchService vagaSearchService)
     {
         _openAIService = openAIService;
         _context = context;
         _remotiveService = remotiveService;
         _joobleService = joobleService;
+        _adzunaService = adzunaService;
         _vagaSearchService = vagaSearchService;
     }
 
@@ -127,6 +130,14 @@ public class VagasController : ControllerBase
 
         return Ok(vagas);
     }
+
+    [HttpGet("buscar-adzuna")]
+        public async Task<IActionResult> BuscarAdzuna()
+        {
+            var vagas = await _adzunaService.BuscarVagas();
+
+            return Ok(vagas);
+        }
 
     // Busca vagas em todas as fontes
     [HttpGet("buscar-todas")]

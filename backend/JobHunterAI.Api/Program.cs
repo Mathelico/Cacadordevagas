@@ -23,6 +23,8 @@ builder.Services.AddHttpClient<RemotiveService>();
 
 builder.Services.AddHttpClient<JoobleService>();
 
+builder.Services.AddHttpClient<AdzunaService>();
+
 builder.Services.AddScoped<VagaSearchService>();
 
 // OpenAPI
@@ -38,6 +40,11 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
+builder.Logging.AddFilter(
+    "System.Net.Http.HttpClient.AdzunaService",
+    LogLevel.Warning
+);
 
 var app = builder.Build();
 
